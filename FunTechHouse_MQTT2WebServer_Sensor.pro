@@ -6,6 +6,9 @@ DEPENDPATH += . src
 INCLUDEPATH += . src
 LIBS += -lmosquittopp -lmosquitto -lcurl
 
+target.path = /usr/local/bin/
+INSTALLS += target
+
 # Input
 SOURCES += main.cpp 
 
