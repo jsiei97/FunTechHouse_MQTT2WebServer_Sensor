@@ -1,0 +1,4 @@
+check process M2W_Sensor with pidfile /var/run/m2w.pid
+    start = "/etc/init.d/FunTechHouse_MQTT2WebServer_Sensor.sh start"
+    stop = "/etc/init.d/FunTechHouse_MQTT2WebServer_Sensor.sh stop"
+
