@@ -1,16 +1,16 @@
 #! /bin/sh
 
 ### BEGIN INIT INFO
-# Provides:		FunTechHouse_MQTT2WebServer_Sensor
+# Provides:	        M2W_Sensor	
 # Required-Start:	$remote_fs $syslog
 # Required-Stop:	$remote_fs $syslog
 # Default-Start:	2 3 4 5
 # Default-Stop:		
-# Short-Description:	FunTechHouse_MQTT2WebServer_Sensor
+# Short-Description:FunTechHouse_MQTT2WebServer_Sensor
 ### END INIT INFO
 
-M2W=/usr/local/bin/FunTechHouse_MQTT2WebServer_Sensor
-M2W_PID=/var/run/m2w.pid
+M2W=/usr/local/bin/M2W_Sensor
+M2W_PID=/var/run/M2W_Sensor.pid
 M2W_CFG=/etc/FunTech_M2W_config.xml
 
 M2W_DESC="FunTechHouse_MQTT2WebServer_Sensor"
