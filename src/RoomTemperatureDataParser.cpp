@@ -2,7 +2,7 @@
 #include <QRegExp>
 #include <QDebug>
 
-#include "RoomTemperatureDataParser.h" 
+#include "RoomTemperatureDataParser.h"
 
 RoomTemperatureDataParser::RoomTemperatureDataParser(QString data)
 {
@@ -23,14 +23,14 @@ bool RoomTemperatureDataParser::parse()
     QRegExp rxData("temperature=([-0-9.]+)");
     QRegExp rxAlarm("Alarm: (.*)");
 
-    if (rxAlarm.indexIn(data) != -1) 
+    if (rxAlarm.indexIn(data) != -1)
     {
         alarm = true;
         //qDebug() << "Got a alarm: " << rxAlarm.cap(1);
         value = rxAlarm.cap(1);
         hit = true;
     }
-    else if (rxData.indexIn(data) != -1) 
+    else if (rxData.indexIn(data) != -1)
     {
         alarm = false;
         //qDebug() << "Data=" << rxData.cap(1);
