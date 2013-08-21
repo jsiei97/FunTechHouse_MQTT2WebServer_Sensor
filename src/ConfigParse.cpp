@@ -89,6 +89,7 @@ bool ConfigParse::parse(QList<Sensor> *list)
                         sensor.setBaseURL( tagE.text() );
                     }
                 }
+
                 {
                     QDomNodeList tagId = e.elementsByTagName("id");
                     for(int i=0; i<tagId.count(); i++)
@@ -110,7 +111,7 @@ bool ConfigParse::parse(QList<Sensor> *list)
                         sensor.setSensorName( tagE.text() );
                     }
                 }
-                
+
                 {
                     QDomNodeList tagId = e.elementsByTagName("topic");
                     for(int i=0; i<tagId.count(); i++)

@@ -18,4 +18,4 @@ class MosqConnect : public mosqpp::mosquittopp
 		void on_subscribe(int mid, int qos_count, const int *granted_qos);
 };
 
-#endif  // __MOSQCONNECT_H 
+#endif  // __MOSQCONNECT_H

@@ -3,15 +3,15 @@
 
 #include "Sensor.h"
 
-class ConfigParse 
+class ConfigParse
 {
-    private: 
+    private:
         QString configfile;
 
         QString mqttServer;
         QString mqttAppName;
 
-    public: 
+    public:
         ConfigParse(QString configfile);
         bool parse(QList<Sensor> *list);
 
@@ -19,4 +19,4 @@ class ConfigParse
         QString getMqttAppName();
 };
 
-#endif  // __CONFIGPARSE_H 
+#endif  // __CONFIGPARSE_H
