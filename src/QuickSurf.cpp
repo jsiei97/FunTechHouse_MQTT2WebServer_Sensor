@@ -17,7 +17,6 @@ bool QuickSurf::doSurf(QString url)
 {
     qDebug() << "doSurf:" << url;
 
-    /*
     CURL *curl;
     CURLcode res = CURLE_OK;
 
@@ -35,7 +34,6 @@ bool QuickSurf::doSurf(QString url)
         qDebug() << "Error: curlfailed:" << (curl_easy_strerror(res));
         return false;
     }
-    */
 
     return true;
 }

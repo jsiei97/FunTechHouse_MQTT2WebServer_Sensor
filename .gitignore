@@ -1,4 +1,11 @@
+# Buildfiles
 *.o
+*.moc
+
+# Autogen
+Makefile
+
+# Misc
 tags
 cscope.files
 cscope.out
