@@ -11,16 +11,16 @@
 
 #include "MosqConnect.h"
 #include "QuickSurf.h"
-#include "Sensor.h"
-#include "RoomTemperatureDataParser.h"
+#include "DataPoint.h"
+#include "MessageParser.h"
 
 
-MosqConnect::MosqConnect(const char *id, const char *host, int port, QList<Sensor> *list) : mosquittopp(id)
+MosqConnect::MosqConnect(const char *id, const char *host, int port, QList<DataPoint> *list) : mosquittopp(id)
 {
     this->list = list;
     int keepalive = 60;
 
-    // Connect immediately. 
+    // Connect immediately.
     connect(host, port, keepalive);
 };
 
@@ -28,13 +28,13 @@ void MosqConnect::on_connect(int rc)
 {
     printf("Connected with code %d.\n", rc);
     if(rc == 0){
-        // Only attempt to subscribe on a successful connect. 
+        // Only attempt to subscribe on a successful connect.
 
         for(int i=0; i<list->size(); i++)
         {
-            Sensor sensor = list->at(i);
-            qDebug() << "subscribe" << sensor.getMosqTopic();
-            subscribe(NULL, sensor.getMosqTopic().toAscii());
+            DataPoint dp = list->at(i);
+            qDebug() << "subscribe" << dp.getMosqTopic();
+            subscribe(NULL, dp.getMosqTopic().toAscii());
         }
     }
 }
@@ -68,19 +68,19 @@ void MosqConnect::on_message(const struct mosquitto_message *message)
 
     for(int i=0; i<list->size(); i++)
     {
-        Sensor sensor = list->at(i);
-        if(topic == sensor.getMosqTopic())
+        DataPoint dp = list->at(i);
+        if(topic == dp.getMosqTopic())
         {
-            qDebug() << "Mess from" << sensor.getName() << mess << topic;
+            qDebug() << "Mess from" << dp.getName() << mess << topic;
 
-            QString url = sensor.getBaseURL();
+            QString url = dp.getBaseURL();
             url.append("?");
-            url.append(sensor.getDeviceId());
+            url.append(dp.getDeviceId());
 
-            qDebug() << "URL" << url;
+            //qDebug() << "URL" << url;
 
             //is this a alarm or normal data?
-            RoomTemperatureDataParser parser(mess);
+            MessageParser parser(mess, dp.getType());
             bool dataOK = false;
             if(parser.parse())
             {
@@ -88,7 +88,7 @@ void MosqConnect::on_message(const struct mosquitto_message *message)
                 {
                     //Send a alarm
                     url.append("&Larm=");
-                    QString alarm(sensor.getName());
+                    QString alarm(dp.getName());
                     alarm.append(" ");
                     alarm.append(parser.getValue());
                     url.append( QUrl::toPercentEncoding(alarm, "", " ") );
@@ -99,9 +99,29 @@ void MosqConnect::on_message(const struct mosquitto_message *message)
                 else
                 {
                     url.append("&");
-                    url.append(sensor.getSensorName());
+                    url.append(dp.getName());
+                    if( parser.getType() == DATAPOINT_REGULATOR ||
+                        parser.getType() == DATAPOINT_REGULATOR )
+                    {
+                        url.append("_Supply");
+                    }
                     url.append("=");
                     url.append(parser.getValue());
+
+                    if(parser.getType() == DATAPOINT_REGULATOR)
+                    {
+                        url.append("&");
+                        url.append(dp.getName());
+                        url.append("_SetPoint");
+                        url.append("=");
+                        url.append(parser.getSetpoint());
+
+                        url.append("&");
+                        url.append(dp.getName());
+                        url.append("_Actuator");
+                        url.append("=");
+                        url.append(parser.getOutput());
+                    }
 
                     dataOK = true;
                 }
@@ -113,6 +133,7 @@ void MosqConnect::on_message(const struct mosquitto_message *message)
                 int  retry = 3;
                 do
                 {
+                    /// @todo Write to pipe, and wait for ack signal
                     result = QuickSurf::doSurf(url);
                     if(result == false)
                     {
@@ -121,7 +142,7 @@ void MosqConnect::on_message(const struct mosquitto_message *message)
                     retry--;
                 } while(result == false && retry != 0);
             }
-        } 
+        }
     }
 }
 

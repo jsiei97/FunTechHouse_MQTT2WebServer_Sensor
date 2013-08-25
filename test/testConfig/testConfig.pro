@@ -1,4 +1,4 @@
-CONFIG += qtestlib
+CONFIG += qtestlib debug
 TEMPLATE = app
 QT += xml 
 TARGET = 
@@ -13,4 +13,4 @@ SOURCES += TestConfig.cpp
 DEPENDPATH  += ../../src/
 INCLUDEPATH += ../../src/
 SOURCES += ConfigParse.cpp
-SOURCES += Sensor.cpp
+SOURCES += DataPoint.cpp

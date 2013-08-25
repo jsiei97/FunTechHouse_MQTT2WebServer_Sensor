@@ -1,7 +1,7 @@
 #ifndef  __CONFIGPARSE_H
 #define  __CONFIGPARSE_H
 
-#include "Sensor.h"
+#include "DataPoint.h"
 
 class ConfigParse
 {
@@ -13,7 +13,7 @@ class ConfigParse
 
     public:
         ConfigParse(QString configfile);
-        bool parse(QList<Sensor> *list);
+        bool parse(QList<DataPoint> *list);
 
         QString getMqttServer();
         QString getMqttAppName();

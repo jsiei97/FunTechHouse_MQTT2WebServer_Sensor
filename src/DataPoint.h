@@ -1,24 +1,25 @@
-#ifndef  __SENSOR_H
-#define  __SENSOR_H
+#ifndef  __DATAPOINT_H
+#define  __DATAPOINT_H
 
 #include <QString>
+#include "global.h"
 
-class Sensor
+class DataPoint
 {
     private:
         QString name;
         QString baseURL;
         QString deviceId;
-        QString sensorName;
+        DataPointType type;
 
         QString mosqTopic;
 
     public:
-        Sensor();
-        Sensor( QString name,
+        DataPoint();
+        DataPoint( QString name,
                 QString baseURL,
                 QString deviceId,
-                QString sensorName,
+                DataPointType type,
                 QString mosqTopic);
 
         bool isOK();
@@ -28,14 +29,15 @@ class Sensor
         void setName( QString name );
         void setBaseURL( QString baseURL );
         void setDeviceId( QString deviceId );
-        void setSensorName( QString sensorName );
+        bool setType( QString type );
+
         void setMosqTopic( QString mosqTopic );
 
         QString getName();
         QString getBaseURL();
         QString getDeviceId();
-        QString getSensorName();
+        DataPointType getType();
         QString getMosqTopic();
 };
 
-#endif  // __SENSOR_H
+#endif  // __DATAPOINT_H

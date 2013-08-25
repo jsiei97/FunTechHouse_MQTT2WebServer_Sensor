@@ -1,4 +1,4 @@
-CONFIG += qtestlib
+CONFIG += qtestlib debug
 TEMPLATE = app
 TARGET = 
 DEFINES += private=public
@@ -11,4 +11,4 @@ SOURCES += TestDataParser.cpp
 # Code to test
 DEPENDPATH  += ../../src/
 INCLUDEPATH += ../../src/
-SOURCES += RoomTemperatureDataParser.cpp
+SOURCES += MessageParser.cpp

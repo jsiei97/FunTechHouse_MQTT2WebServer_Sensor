@@ -2,15 +2,15 @@
 #define  __MOSQCONNECT_H
 
 #include <mosquittopp.h>
-#include "Sensor.h"
+#include "DataPoint.h"
 
 class MosqConnect : public mosqpp::mosquittopp
 {
     private:
-        QList<Sensor> *list;
+        QList<DataPoint> *list;
 
 	public:
-		MosqConnect(const char *id, const char *host, int port, QList<Sensor> *list);
+		MosqConnect(const char *id, const char *host, int port, QList<DataPoint> *list);
 		~MosqConnect();
 
 		void on_connect(int rc);

@@ -8,7 +8,8 @@
 #include <QDomNode>
 
 #include "ConfigParse.h"
-#include "Sensor.h"
+#include "DataPoint.h"
+#include "global.h"
 
 ConfigParse::ConfigParse(QString configfile)
 {
@@ -27,16 +28,17 @@ QString ConfigParse::getMqttAppName()
     return mqttAppName;
 }
 
-bool ConfigParse::parse(QList<Sensor> *list)
+bool ConfigParse::parse(QList<DataPoint> *list)
 {
 
+    bool ret = true;
     /*
        for(int i=1; i<6; i++)
        {
-       QString name("Sensor");
+       QString name("DataPoint");
        name.append(QString("%1").arg(i));
        qDebug() << name;
-       list->append(Sensor(name,  "b", "c", "d", "e"));
+       list->append(DataPoint(name,  "b", "c", "d", "e"));
        }
        */
 
@@ -69,14 +71,14 @@ bool ConfigParse::parse(QList<Sensor> *list)
             {
                 mqttAppName = e.text().trimmed();
             }
-            if(e.tagName() == "sensor")
+            if(e.tagName() == "datapoint")
             {
-                Sensor sensor;
+                DataPoint dp;
                 //qDebug() << qPrintable(e.tagName()); // the node really is an element.
                 if(e.hasAttribute("name"))
                 {
                     //qDebug() << qPrintable(e.tagName()) << qPrintable(e.attribute("name"));
-                    sensor.setName( e.attribute("name") );
+                    dp.setName( e.attribute("name") );
                 }
 
                 {
@@ -86,7 +88,7 @@ bool ConfigParse::parse(QList<Sensor> *list)
                         QDomNode tag = tagId.at(i);
                         QDomElement tagE = tag.toElement();
                         //qDebug() << qPrintable(tagE.tagName()) << tagE.text();
-                        sensor.setBaseURL( tagE.text() );
+                        dp.setBaseURL( tagE.text() );
                     }
                 }
 
@@ -97,18 +99,22 @@ bool ConfigParse::parse(QList<Sensor> *list)
                         QDomNode tag = tagId.at(i);
                         QDomElement tagE = tag.toElement();
                         //qDebug() << qPrintable(tagE.tagName()) << tagE.text();
-                        sensor.setDeviceId( tagE.text() );
+                        dp.setDeviceId( tagE.text() );
                     }
                 }
 
                 {
-                    QDomNodeList tagId = e.elementsByTagName("sensor_name");
+                    QDomNodeList tagId = e.elementsByTagName("type");
                     for(int i=0; i<tagId.count(); i++)
                     {
                         QDomNode tag = tagId.at(i);
                         QDomElement tagE = tag.toElement();
                         //qDebug() << qPrintable(tagE.tagName()) << tagE.text();
-                        sensor.setSensorName( tagE.text() );
+                        if(!dp.setType( tagE.text() ))
+                        {
+                            qDebug() << "Error: not a valid type:" << tagE.text();
+                            ret = false;
+                        }
                     }
                 }
 
@@ -119,14 +125,14 @@ bool ConfigParse::parse(QList<Sensor> *list)
                         QDomNode tag = tagId.at(i);
                         QDomElement tagE = tag.toElement();
                         //qDebug() << qPrintable(tagE.tagName()) << tagE.text();
-                        sensor.setMosqTopic( tagE.text() );
+                        dp.setMosqTopic( tagE.text() );
                     }
                 }
 
 
-                if(sensor.isOK())
+                if(dp.isOK())
                 {
-                    list->append(sensor);
+                    list->append(dp);
                 }
             }
         }
@@ -145,5 +151,5 @@ bool ConfigParse::parse(QList<Sensor> *list)
         return false;
     }
 
-    return true;
+    return ret;
 }

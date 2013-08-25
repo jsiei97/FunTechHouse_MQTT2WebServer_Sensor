@@ -1,25 +1,39 @@
 <config>
     <mqtt_server> localhost </mqtt_server>
-    <mqtt_appname> FunTechHouse_MQTT2WebServer_Sensor__01 </mqtt_appname>
+    <mqtt_appname> FunTechHouse_MQTT2WebServer </mqtt_appname>
 
-    <sensor name="sensor01">
-        <baseurl> http://localhost/test/index.php </baseurl>
-        <id> id=1 </id>
-        <sensor_name> ref01 </sensor_name>
+    <datapoint name="ref01">
+        <baseurl>http://localhost/test/index.php</baseurl>
+        <id> s=1 </id>
+        <type> sensor </type>
         <topic> FunTechHouse/Room1/Temperature </topic>
-    </sensor>
+    </datapoint>
 
-    <sensor name="sensor02">
+    <datapoint name="Shunt3">
         <baseurl>http://localhost/test/index.php</baseurl>
-        <id>id=2</id>
-        <sensor_name>ref02</sensor_name>
-        <topic>FunTechHouse/Room2/Temperature</topic>
-    </sensor>
+        <id> id=1 </id>
+        <type> regulator </type>
+        <topic> FunTechHouse/Pannrum/ElPanna </topic>
+    </datapoint>
 
-    <sensor name="sensor03">
+    <datapoint name="Shunt2">
         <baseurl>http://localhost/test/index.php</baseurl>
-        <id>id=3</id>
-        <sensor_name>ref03</sensor_name>
-        <topic>FunTechHouse/Room3/Temperature</topic>
-    </sensor>
+        <id> id=2 </id>
+        <type> regulator </type>
+        <topic> FunTechHouse/Pannrum/VMP </topic>
+    </datapoint>
+
+    <datapoint name="Shunt1">
+        <baseurl>http://localhost/test/index.php</baseurl>
+        <id> id=2 </id>
+        <type> regulator </type>
+        <topic> FunTechHouse/Pannrum/shunt </topic>
+    </datapoint>
+
+    <datapoint name="El">
+        <baseurl>http://localhost/test/index.php</baseurl>
+        <id> id=6 </id>
+        <type> meter </type>
+        <topic> FunTechHouse/el </topic>
+    </datapoint>
 </config>

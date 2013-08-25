@@ -1,8 +1,9 @@
 #include <QtCore>
 #include <QtTest>
 
-#include "Sensor.h"
+#include "DataPoint.h"
 #include "ConfigParse.h"
+#include "global.h"
 
 class TestConfig : public QObject
 {
@@ -12,87 +13,107 @@ class TestConfig : public QObject
     public:
 
     private slots:
-        void testSensor();
-        void testParseFile();
+        void testDataPoint();
+        void testParseFile_02();
 };
 
-void TestConfig::testSensor()
+void TestConfig::testDataPoint()
 {
-    Sensor sensor;
-    QCOMPARE(sensor.isOK(), false);
+    DataPoint dp;
+    QCOMPARE(dp.isOK(), false);
+
     {
         QString data("test01");
-        sensor.setName( data);
-        QCOMPARE(sensor.getName(), data);
+        dp.setName( data);
+        QCOMPARE(dp.getName(), data);
     }
-    QCOMPARE(sensor.isOK(), false);
+    QCOMPARE(dp.isOK(), false);
+
     {
         QString data("test02");
-        sensor.setBaseURL( data );
-        QCOMPARE(sensor.getBaseURL(), data);
+        dp.setBaseURL( data );
+        QCOMPARE(dp.getBaseURL(), data);
     }
-    QCOMPARE(sensor.isOK(), false);
+    QCOMPARE(dp.isOK(), false);
+
     {
         QString data("test03");
-        sensor.setDeviceId( data );
-        QCOMPARE(sensor.getDeviceId(), data);
+        dp.setDeviceId( data );
+        QCOMPARE(dp.getDeviceId(), data);
     }
-    QCOMPARE(sensor.isOK(), false);
-    {
-        QString data("test04");
-        sensor.setSensorName( data );
-        QCOMPARE(sensor.getSensorName(), data);
-    }
-    QCOMPARE(sensor.isOK(), false);
+    QCOMPARE(dp.isOK(), false);
+
     {
         QString data("test05");
-        sensor.setMosqTopic( data );
-        QCOMPARE(sensor.getMosqTopic(), data);
+        dp.setMosqTopic( data );
+        QCOMPARE(dp.getMosqTopic(), data);
     }
-    QCOMPARE(sensor.isOK(), true);
+    QCOMPARE(dp.isOK(), false);
+
+    {
+        dp.setType( "sensor" );
+        QCOMPARE((int)dp.getType(), (int)DATAPOINT_SENSOR);
+    }
+    QCOMPARE(dp.isOK(), true);
 
 }
-void TestConfig::testParseFile()
+
+
+void TestConfig::testParseFile_02()
 {
-    //QCOMPARE(10.0, filter.getValue());
+    ConfigParse config("files/config02.xml");
+    QList<DataPoint> *list;
+    list = new QList<DataPoint>;
 
-    ConfigParse config("files/config01.xml");
-    QList<Sensor> *list;
-    list = new QList<Sensor>;
+    QVERIFY(config.parse(list));
 
-    config.parse(list);
+    QCOMPARE(config.getMqttServer(), QString("localhost"));
+    QCOMPARE(config.getMqttAppName(),QString("FunTechHouse_MQTT2WebServer"));
 
-    QCOMPARE(config.getMosqServer(), QString("localhost"));
-    QCOMPARE(config.getAppName(),    QString("FunTechHouse_MQTT2WebServer_Sensor__01"));
-
-    QCOMPARE(list->size(), 3);
-
+    QCOMPARE(list->size(), 5);
 
     {
-        Sensor sensor = list->at(0);
-        QCOMPARE(sensor.getName(),    QString("sensor01"));
-        QCOMPARE(sensor.getBaseURL(), QString("http://localhost/test/index.php"));
-        QCOMPARE(sensor.getDeviceId(), QString("id=1"));
-        QCOMPARE(sensor.getSensorName(), QString("ref01"));
-        QCOMPARE(sensor.getMosqTopic(), QString("FunTechHouse/Room1/Temperature"));
+        DataPoint dp = list->at(0);
+        QCOMPARE(dp.getName(),    QString("ref01"));
+        QCOMPARE(dp.getBaseURL(), QString("http://localhost/test/index.php"));
+        QCOMPARE(dp.getDeviceId(), QString("s=1"));
+        QCOMPARE((int)dp.getType(), (int)DATAPOINT_SENSOR );
+        QCOMPARE(dp.getMosqTopic(), QString("FunTechHouse/Room1/Temperature"));
     }
 
     {
-        Sensor sensor = list->at(1);
-        QCOMPARE(sensor.getName(),    QString("sensor02"));
-        QCOMPARE(sensor.getBaseURL(), QString("http://localhost/test/index.php"));
-        QCOMPARE(sensor.getDeviceId(), QString("id=2"));
-        QCOMPARE(sensor.getSensorName(), QString("ref02"));
-        QCOMPARE(sensor.getMosqTopic(), QString("FunTechHouse/Room2/Temperature"));
+        DataPoint dp = list->at(1);
+        QCOMPARE(dp.getName(),    QString("Shunt3"));
+        QCOMPARE(dp.getBaseURL(), QString("http://localhost/test/index.php"));
+        QCOMPARE(dp.getDeviceId(), QString("id=1"));
+        QCOMPARE((int)dp.getType(), (int)DATAPOINT_REGULATOR);
+        QCOMPARE(dp.getMosqTopic(), QString("FunTechHouse/Pannrum/ElPanna"));
     }
 
     {
-        Sensor sensor = list->at(2);
-        QCOMPARE(sensor.getName(),    QString("sensor03"));
-        QCOMPARE(sensor.getBaseURL(), QString("http://localhost/test/index.php"));
-        QCOMPARE(sensor.getDeviceId(), QString("id=3"));
-        QCOMPARE(sensor.getSensorName(), QString("ref03"));
-        QCOMPARE(sensor.getMosqTopic(), QString("FunTechHouse/Room3/Temperature"));
+        DataPoint dp = list->at(2);
+        QCOMPARE(dp.getName(),    QString("Shunt2"));
+        QCOMPARE(dp.getBaseURL(), QString("http://localhost/test/index.php"));
+        QCOMPARE(dp.getDeviceId(), QString("id=2"));
+        QCOMPARE((int)dp.getType(), (int)DATAPOINT_REGULATOR);
+        QCOMPARE(dp.getMosqTopic(), QString("FunTechHouse/Pannrum/VMP"));
+    }
+
+    {
+        DataPoint dp = list->at(3);
+        QCOMPARE(dp.getName(),    QString("Shunt1"));
+        QCOMPARE(dp.getBaseURL(), QString("http://localhost/test/index.php"));
+        QCOMPARE(dp.getDeviceId(), QString("id=2"));
+        QCOMPARE((int)dp.getType(), (int)DATAPOINT_REGULATOR);
+        QCOMPARE(dp.getMosqTopic(), QString("FunTechHouse/Pannrum/shunt"));
+    }
+    {
+        DataPoint dp = list->at(4);
+        QCOMPARE(dp.getName(),    QString("El"));
+        QCOMPARE(dp.getBaseURL(), QString("http://localhost/test/index.php"));
+        QCOMPARE(dp.getDeviceId(), QString("id=6"));
+        QCOMPARE((int)dp.getType(), (int)DATAPOINT_METER);
+        QCOMPARE(dp.getMosqTopic(), QString("FunTechHouse/el"));
     }
 
 }

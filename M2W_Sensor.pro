@@ -15,8 +15,8 @@ SOURCES += main.cpp
 SOURCES += ConfigParse.cpp 
 HEADERS += ConfigParse.h 
 
-SOURCES += Sensor.cpp
-HEADERS += Sensor.h
+SOURCES += DataPoint.cpp
+HEADERS += DataPoint.h
 
 SOURCES += MosqConnect.cpp
 HEADERS += MosqConnect.h
@@ -24,5 +24,5 @@ HEADERS += MosqConnect.h
 SOURCES += QuickSurf.cpp
 HEADERS += QuickSurf.h
 
-SOURCES += RoomTemperatureDataParser.cpp
-HEADERS += RoomTemperatureDataParser.h
+SOURCES += MessageParser.cpp
+HEADERS += MessageParser.h
