@@ -88,36 +88,24 @@ int main(int argc, char *argv[])
         switch(next_option)
         {
             case -1 :
-                {
-                    break;
-                }
+                break;
             case 'h':
-                {
-                    print_usage();
-                    break;
-                }
+                print_usage();
+                break;
             case 'v':
-                {
-                    verbose++;
-                    break;
-                }
+                verbose++;
+                break;
             case 'c':
-                {
-                    configFile.setFileName( QString(optarg) );
-                    break;
-                }
+                configFile.setFileName( QString(optarg) );
+                break;
             case 't':
-                {
-                    verbose++;
-                    testConfig = true;
-                    break;
-                }
+                verbose++;
+                testConfig = true;
+                break;
             default:
-                {
-                    printf("Error\n");
-                    abort();
-                    break;
-                }
+                printf("Error\n");
+                abort();
+                break;
         }
     }while(next_option != -1);
 
