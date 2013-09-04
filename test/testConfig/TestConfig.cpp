@@ -14,7 +14,7 @@ class TestConfig : public QObject
 
     private slots:
         void testDataPoint();
-        void testParseFile_02();
+        void testParseFile();
 };
 
 void TestConfig::testDataPoint()
@@ -59,9 +59,9 @@ void TestConfig::testDataPoint()
 }
 
 
-void TestConfig::testParseFile_02()
+void TestConfig::testParseFile()
 {
-    ConfigParse config("files/config02.xml");
+    ConfigParse config("files/config01.xml");
     QList<DataPoint> *list;
     list = new QList<DataPoint>;
 
