@@ -37,6 +37,7 @@ class MessageParser
         QString value;
         QString setpoint;
         QString output;
+        QString active;
 
 
     public:
@@ -50,6 +51,7 @@ class MessageParser
         QString getValue();
         QString getSetpoint();
         QString getOutput();
+        QString getActive();
 
 };
 

@@ -144,6 +144,12 @@ void MosqConnect::on_message(const struct mosquitto_message *message)
                         url.append("_Actuator");
                         url.append("=");
                         url.append(parser.getOutput());
+
+                        url.append("&");
+                        url.append(dp.getName());
+                        url.append("_Activator");
+                        url.append("=");
+                        url.append(parser.getActive());
                     }
 
                     dataOK = true;

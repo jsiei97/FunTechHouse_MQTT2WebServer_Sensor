@@ -22,6 +22,7 @@
  */
 
 #include <QString>
+#include <QStringList>
 #include <QRegExp>
 #include <QDebug>
 
@@ -34,7 +35,6 @@ MessageParser::MessageParser(QString data, DataPointType type)
     this->data = data;
 
     alarm = false;
-    value = "";
 }
 
 bool MessageParser::parse()
@@ -54,7 +54,7 @@ bool MessageParser::parse()
             rxData.setPattern("temperature=([-0-9.]+)");
             break;
         case DATAPOINT_REGULATOR:
-            rxData.setPattern("value=([-0-9.]+) ; setpoint=([-0-9.]+) ; output=([0-9]+)%");
+            rxData.setPattern("value=([-0-9.]+).*");
             break;
         case DATAPOINT_METER:
             rxData.setPattern("energy=([-0-9.]+) kWh");
@@ -81,10 +81,25 @@ bool MessageParser::parse()
             alarm = false;
             //qDebug() << "Data=" << rxData.cap(1);
             value =  rxData.cap(1);
-            if(3 == rxData.captureCount())
+
+            QRegExp rxValue("value=([-0-9.]+)");
+            QRegExp rxSetpoint("setpoint=([-0-9.]+)");
+            QRegExp rxOutput("output=([-0-9.]+)%");
+            QRegExp rxActive("active=([-0-9.]+)%");
+            QStringList list = data.split(";", QString::SkipEmptyParts);
+            for (int i = 0; i < list.size(); ++i)
             {
-                setpoint =  rxData.cap(2);
-                output   =  rxData.cap(3);
+                QString part = list.at(i).trimmed();
+                //qDebug() << part;
+
+                if (rxValue.indexIn(part) != -1)
+                    value =  rxValue.cap(1);
+                else if (rxSetpoint.indexIn(part) != -1)
+                    setpoint = rxSetpoint.cap(1);
+                else if (rxOutput.indexIn(part) != -1)
+                    output = rxOutput.cap(1);
+                else if (rxActive.indexIn(part) != -1)
+                    active = rxActive.cap(1);
             }
         }
     }
@@ -113,4 +128,20 @@ QString MessageParser::getSetpoint()
 QString MessageParser::getOutput()
 {
     return output;
+}
+
+QString MessageParser::getActive()
+{
+    if(!active.isEmpty())
+        return active;
+
+    if(output.isEmpty())
+        return "000";
+
+    if(output.compare("000")==0)
+       return "000";
+    else
+        return "100";
+
+    return "";
 }
