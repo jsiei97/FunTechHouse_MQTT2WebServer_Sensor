@@ -1,6 +1,6 @@
 /**
  * @file MosqConnect.cpp
- * @author Johan Simonsson  
+ * @author Johan Simonsson
  * @brief Mosquitto interface
  */
 
@@ -89,6 +89,8 @@ void MosqConnect::on_message(const struct mosquitto_message *message)
 
     //qDebug() << "\nNew message:" << (QDateTime::currentDateTime()).toString("hh:mm:ss") << topic << mess;
 
+    /// @todo create topic2url function
+
     for(int i=0; i<list->size(); i++)
     {
         DataPoint dp = list->at(i);
@@ -145,11 +147,14 @@ void MosqConnect::on_message(const struct mosquitto_message *message)
                         url.append("=");
                         url.append(parser.getOutput());
 
-                        url.append("&");
-                        url.append(dp.getName());
-                        url.append("_Activator");
-                        url.append("=");
-                        url.append(parser.getActive());
+                        if(!parser.getActive().isEmpty())
+                        {
+                            url.append("&");
+                            url.append(dp.getName());
+                            url.append("_Activator");
+                            url.append("=");
+                            url.append(parser.getActive());
+                        }
                     }
 
                     dataOK = true;

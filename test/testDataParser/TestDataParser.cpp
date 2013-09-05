@@ -56,23 +56,31 @@ void TestDataParser::testParse_data()
 
     QTest::newRow("regul 01") << "value=55.69 ; setpoint=60.00 ; output=000%" 
         << (int)DATAPOINT_REGULATOR << false 
-        << "55.69" << "60.00" << "000" << "000";
+        << "55.69" << "60.00" << "000" << "";
 
     QTest::newRow("regul 02") << "value=54.97 ; setpoint=60.00 ; output=033%" 
         << (int)DATAPOINT_REGULATOR << false 
-        << "54.97" << "60.00" << "033" << "100";
+        << "54.97" << "60.00" << "033" << "";
 
     QTest::newRow("regul 03") << "value=-10.21 ; setpoint=-35.00 ; output=070%" 
         << (int)DATAPOINT_REGULATOR << false 
-        << "-10.21" << "-35.00" << "070" << "100";
+        << "-10.21" << "-35.00" << "070" << "";
 
     QTest::newRow("regul 04") << "value=102.30 ; setpoint=25.56 ; output=100%" 
         << (int)DATAPOINT_REGULATOR << false 
-        << "102.30" << "25.56" << "100" << "100";
+        << "102.30" << "25.56" << "100" << "";
 
     QTest::newRow("regul 05") << "value=102.30 ; setpoint=25.56 ; output=100% ; active=60%" 
         << (int)DATAPOINT_REGULATOR << false 
         << "102.30" << "25.56" << "100" << "60";
+
+    QTest::newRow("regul 06") << "value=102.30 ; setpoint=25.56 ; output=100% ; active=000%" 
+        << (int)DATAPOINT_REGULATOR << false 
+        << "102.30" << "25.56" << "100" << "000";
+
+    QTest::newRow("regul 07") << "value=102.30 ; setpoint=25.56 ; output=100% ; active=100%" 
+        << (int)DATAPOINT_REGULATOR << false 
+        << "102.30" << "25.56" << "100" << "100";
 
     QTest::newRow("Regul Alarm 01") 
         << "Alarm: Low ; value=13.56 ; alarm=45.67 ; setpoint=50 ; output=100%"
@@ -119,6 +127,7 @@ void TestDataParser::testParse()
                 QCOMPARE(parser.getOutput(), output);
                 QCOMPARE(parser.getActive(), active);
             }
+            QCOMPARE(parser.getActive().isEmpty(), active.isEmpty());
             break;
         case DATAPOINT_METER:
             QCOMPARE(parser.isAlarm(), isAlarm);

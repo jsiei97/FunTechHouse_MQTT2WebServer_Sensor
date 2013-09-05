@@ -135,13 +135,5 @@ QString MessageParser::getActive()
     if(!active.isEmpty())
         return active;
 
-    if(output.isEmpty())
-        return "000";
-
-    if(output.compare("000")==0)
-       return "000";
-    else
-        return "100";
-
     return "";
 }
