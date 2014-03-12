@@ -25,11 +25,15 @@
 #include <QFile>
 #include <QFileInfo>
 
-#include <getopt.h> /* getopt_long */
+#include <errno.h>
+#include <getopt.h>
+#include <linux/kernel.h> // for struct sysinfo
+#include <linux/unistd.h> // for _syscallX macros/related stuff
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <sys/sysinfo.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -38,6 +42,7 @@
 #include "MosqConnect.h"
 
 void sigusr2(int signo, siginfo_t *info, void *extra);
+void sigterm(int signo, siginfo_t *info, void *extra);
 
 void print_usage()
 {
@@ -49,12 +54,21 @@ void print_usage()
 
 pid_t pidMain = 0;
 pid_t pidMosq = 0;
-pid_t pidSurf = 0;
-
-//QString pipeSurfInput = "/tmp/surfUrlPipe.fifo";
-QString pipeSurfInput = "surfUrlPipe.fifo";
+long  mosqUptime = 0;
 
 
+long get_uptime()
+{
+    struct sysinfo s_info;
+    int error;
+    error = sysinfo(&s_info);
+    if(error != 0)
+    {
+        printf("code error = %d\n", error);
+        return -1;
+    }
+    return s_info.uptime;
+}
 
 int main(int argc, char *argv[])
 {
@@ -161,50 +175,24 @@ int main(int argc, char *argv[])
 
 
     //
-    //Let's create the fifo/pipe that will be used to send data from mosq to surf,
-    //and let's do this before we create those threads...
-    //
-    {
-        QFileInfo pipeInfo(pipeSurfInput);
-        if(!pipeInfo.exists())
-        {
-            //Missing, let's try to create it
-            int result = mkfifo (pipeInfo.absoluteFilePath().toAscii(), S_IRUSR| S_IWUSR);
-            if (result < 0)
-            {
-                //perror ("mkfifo");
-                qDebug() << "Error mkfifo" << result << pipeInfo.absoluteFilePath();
-                exit (2);
-            }
-        }
-    }
-
-    {
-        QFileInfo pipeInfo(pipeSurfInput);
-        if(!pipeInfo.exists())
-        {
-            qDebug() << "Error no file" << pipeInfo.absoluteFilePath();
-            exit(3);
-        }
-    }
-
-    //
     //Let's create the signal reciver for the ET phone home pings
     //
     //MetodikTest/qt/unixSignals_kill
     //MetodikTest/C/fork/sigusr1.c
 
-    qDebug() << "SIGUSR2 .... " << SIGUSR2;
+    //qDebug() << "SIGUSR2 .... " << SIGUSR2;
 
-    //Add sigqueue for SIGUSR2
-    struct sigaction action;
+    {
+        //Add sigqueue for SIGUSR2
+        struct sigaction action;
 
-    action.sa_flags = SA_SIGINFO;
-    action.sa_sigaction = &sigusr2;
+        action.sa_flags = SA_SIGINFO;
+        action.sa_sigaction = &sigusr2;
 
-    if (sigaction(SIGUSR2, &action, NULL) == -1) {
-        perror("sigusr: sigaction");
-        _exit(1);
+        if (sigaction(SIGUSR2, &action, NULL) == -1) {
+            perror("sigusr: sigaction");
+            _exit(1);
+        }
     }
 
     //
@@ -213,25 +201,38 @@ int main(int argc, char *argv[])
     pidMain = getpid();
     //qDebug() << "Master/main pid" << pidMain;
 
-    /*
     pid_t forkvalue = fork();
     if(0 == forkvalue)
     {
         pidMosq = getpid();
-        qDebug() << "Child/MQTT :" << "Master:" << pidMain << "Mosq:" << pidMosq << "Surf" << pidSurf;
-        /// @todo Start the MQTT/Mosq class
-        /// Use write in: MetodikTest/qt/thread
+        qDebug() << "Child/MQTT :" << "Master:" << pidMain << "Mosq:" << pidMosq;
 
-        for( int i=0 ; i<3 ; i++ )
+        class MosqConnect *mqtt;
+        int rc;
+
+        mosqpp::lib_init();
+
+        mqtt = new MosqConnect(
+                config.getMqttAppName().toAscii(),
+                config.getMqttServer().toAscii(),
+                1883,
+                list
+                );
+
+        while(1)
         {
-            sleep(1);
-            //qDebug() << "+";
+            rc = mqtt->loop();
+            if(rc)
+            {
+                mqtt->reconnect();
+            }
 
+            sleep(1);
             union sigval value;
             value.sival_int = 30;
             sigqueue(pidMain, SIGUSR2, value);
         }
-
+        mosqpp::lib_cleanup();
         qDebug() << "Child/MQTT : Done";
         exit(1);
     }
@@ -241,79 +242,59 @@ int main(int argc, char *argv[])
         pidMosq = forkvalue;
     }
 
-    forkvalue = fork();
-    if(0 == forkvalue)
+    qDebug() << "Master/main :" << "Master:" << pidMain << "Mosq:" << pidMosq;
+
+
     {
-        pidSurf = getpid();
-        qDebug() << "Child/Surf :" << "Master:" << pidMain << "Mosq:" << pidMosq << "Surf" << pidSurf;
-        /// @todo Start the QuickSurf class
-        /// Use read in: MetodikTest/qt/thread
+        //Add sigqueue for SIGTERM
+        struct sigaction action;
+
+        action.sa_flags = SA_SIGINFO;
+        action.sa_sigaction = &sigterm;
+
+        if (sigaction(SIGTERM, &action, NULL) == -1) {
+            perror("sigterm: sigaction");
+            _exit(1);
+        }
+    }
 
 
-        for( int i=0 ; i<3 ; i++ )
+    //Wait for the other process to become stable
+    sleep(10);
+
+    while(1)
+    {
+        long time = get_uptime();
+
+        if( (time-mosqUptime) > 120 )
         {
+            printf("No phone home, lets kill pid: %d\n", pidMosq);
+            kill(pidMosq, SIGKILL);
             sleep(1);
-            //qDebug() << "*";
-
-            union sigval value;
-            value.sival_int = 40;
-            sigqueue(pidMain, SIGUSR2, value);
+            exit(1);
         }
-        qDebug() << "Child/Surf : Done";
-        exit(1);
+
+        sleep(1);
     }
-    else
-    {
-        //qDebug() << "Master/main:" << getpid() << forkvalue;
-        pidSurf = forkvalue;
-    }
-
-    sleep(1);
-    if(verbose > 0)
-    {
-        qDebug() << "Main process Master:" << pidMain << "Mosq:" << pidMosq << "Surf" << pidSurf << "\n";
-    }
-    */
-
-
-
-
-
-    class MosqConnect *mqtt;
-    int rc;
-
-    mosqpp::lib_init();
-
-    mqtt = new MosqConnect(
-            config.getMqttAppName().toAscii(),
-            config.getMqttServer().toAscii(),
-            1883,
-            list
-            );
-
-    while(1){
-        rc = mqtt->loop();
-        if(rc){
-            mqtt->reconnect();
-        }
-    }
-
-    mosqpp::lib_cleanup();
-
-    /*
-       sleep(15);
-       qDebug() << "Let's cleanup and exit...";
-
-       union sigval value;
-       value.sival_int = 100;
-       sigqueue(pidSurf, 9, value);
-       sigqueue(pidMosq, 9, value);
-       sigqueue(pidMain, 9, value);
-       */
-
-    while( true );
 }
 
+void sigterm(int signo, siginfo_t *info, void *extra)
+{
+    //http://www.kernel.org/doc/man-pages/online/pages/man2/sigaction.2.html
+    void* pval = info->si_value.sival_ptr;
+
+    int   val = info->si_value.sival_int;
+    pid_t pid = info->si_pid; // Sending process ID
+    uid_t uid = info->si_uid; // Real user ID of sending process
+
+    printf("%s:%d : Signal %d, value %d pid=%d uid=%d \n", __func__, __LINE__, signo, val, pid, uid);
+
+    printf("%s:%d : send kill to pid=%d \n", __func__, __LINE__, pidMosq);
+    kill(pidMosq, SIGKILL);
+    sleep(1);
+    printf("%s:%d : About to exit, pid=%d \n", __func__, __LINE__, pidMain);
+    exit(1);
+}
 
 void sigusr2(int signo, siginfo_t *info, void *extra)
 {
@@ -324,30 +305,12 @@ void sigusr2(int signo, siginfo_t *info, void *extra)
     pid_t pid = info->si_pid; // Sending process ID
     uid_t uid = info->si_uid; // Real user ID of sending process
 
-    printf("Signal %d, value %d pid=%d uid=%d \n", signo, val, pid, uid);
-
-    if(pid == pidSurf)
-    {
-        printf("pidSurf is alive\n");
-    }
+    //printf("%s:%d : Signal %d, value %d pid=%d uid=%d \n", __func__, __LINE__, signo, val, pid, uid);
 
     if(pid == pidMosq)
     {
-        printf("pidMosq is alive\n");
+        printf("%s:%d : pidMosq is alive\n", __func__, __LINE__);
+        mosqUptime = get_uptime();
     }
-
-    printf("\n");
-    /*
-       if(int_val == 666)
-       {
-       printf("PING: Signal %d, value %d pid=%d uid=%d \n", signo, int_val, int_pid, int_uid);
-
-       union sigval value;
-       value.sival_int = 666;
-       sigqueue(int_pid,SIGUSR2, value);
-
-    //kill(int_pid, SIGUSR2);
-    }
-    */
 }
 
