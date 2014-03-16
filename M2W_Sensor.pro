@@ -1,6 +1,6 @@
 TEMPLATE = app
-QT += xml 
-TARGET = 
+QT += xml
+TARGET =
 
 DEPENDPATH += . src
 INCLUDEPATH += . src
@@ -10,10 +10,10 @@ target.path = /usr/local/bin/
 INSTALLS += target
 
 # Input
-SOURCES += main.cpp 
+SOURCES += main.cpp
 
-SOURCES += ConfigParse.cpp 
-HEADERS += ConfigParse.h 
+SOURCES += ConfigParse.cpp
+HEADERS += ConfigParse.h
 
 SOURCES += DataPoint.cpp
 HEADERS += DataPoint.h
@@ -26,3 +26,6 @@ HEADERS += QuickSurf.h
 
 SOURCES += MessageParser.cpp
 HEADERS += MessageParser.h
+
+SOURCES += Mosq2QuickSurf.cpp
+HEADERS += Mosq2QuickSurf.h

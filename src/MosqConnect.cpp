@@ -33,7 +33,7 @@
 #include <mosquittopp.h>
 
 #include "MosqConnect.h"
-#include "QuickSurf.h"
+#include "Mosq2QuickSurf.h"
 #include "DataPoint.h"
 #include "MessageParser.h"
 
@@ -97,84 +97,11 @@ void MosqConnect::on_message(const struct mosquitto_message *message)
         if(topic == dp.getMosqTopic())
         {
             qDebug() << "Mess from" << dp.getName() << mess << topic;
-
-            QString url = dp.getBaseURL();
-            url.append("?");
-            url.append(dp.getDeviceId());
-
-            //qDebug() << "URL" << url;
-
-            //is this a alarm or normal data?
-            MessageParser parser(mess, dp.getType());
-            bool dataOK = false;
-            if(parser.parse())
+            if(!Mosq2QuickSurf::send(&dp, mess))
             {
-                if(parser.isAlarm())
-                {
-                    //Send a alarm
-                    url.append("&Larm=");
-                    QString alarm(dp.getName());
-                    alarm.append(" ");
-                    alarm.append(parser.getValue());
-                    url.append( QUrl::toPercentEncoding(alarm, "", " ") );
-                    qDebug() << "Alarm url:" << url;
+                qDebug() << "Error, FAILED to send mess to webserver:" 
+                    << dp.getName() << mess << topic;
 
-                    dataOK = true;
-                }
-                else
-                {
-                    url.append("&");
-                    url.append(dp.getName());
-                    if( parser.getType() == DATAPOINT_REGULATOR ||
-                        parser.getType() == DATAPOINT_REGULATOR )
-                    {
-                        url.append("_Supply");
-                    }
-                    url.append("=");
-                    url.append(parser.getValue());
-
-                    if(parser.getType() == DATAPOINT_REGULATOR)
-                    {
-                        url.append("&");
-                        url.append(dp.getName());
-                        url.append("_SetPoint");
-                        url.append("=");
-                        url.append(parser.getSetpoint());
-
-                        url.append("&");
-                        url.append(dp.getName());
-                        url.append("_Actuator");
-                        url.append("=");
-                        url.append(parser.getOutput());
-
-                        if(!parser.getActive().isEmpty())
-                        {
-                            url.append("&");
-                            url.append(dp.getName());
-                            url.append("_Activator");
-                            url.append("=");
-                            url.append(parser.getActive());
-                        }
-                    }
-
-                    dataOK = true;
-                }
-            }
-
-            if(dataOK)
-            {
-                bool result = false;
-                int  retry = 3;
-                do
-                {
-                    /// @todo Write to pipe, and wait for ack signal
-                    result = QuickSurf::doSurf(url);
-                    if(result == false)
-                    {
-                        qDebug() << "Error: QuickSurf failed: retry" << retry;
-                    }
-                    retry--;
-                } while(result == false && retry != 0);
             }
         }
     }
