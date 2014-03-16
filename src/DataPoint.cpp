@@ -120,6 +120,11 @@ bool DataPoint::setType( QString type ){
             this->type = DATAPOINT_METER;
             ret = true;
     }
+    else if(0==type.compare("rh"))
+    {
+            this->type = DATAPOINT_RH;
+            ret = true;
+    }
     else
     {
         qDebug() << __FILE__ << __LINE__ << "Error: What is this?" << type;

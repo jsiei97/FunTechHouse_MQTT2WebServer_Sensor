@@ -36,4 +36,11 @@
         <type> meter </type>
         <topic> FunTechHouse/el </topic>
     </datapoint>
+
+    <datapoint name="Ref20">
+        <baseurl>http://localhost/test/index.php</baseurl>
+        <id> id=7 </id>
+        <type> rh </type>
+        <topic> FunTechHouse/rh </topic>
+    </datapoint>
 </config>
