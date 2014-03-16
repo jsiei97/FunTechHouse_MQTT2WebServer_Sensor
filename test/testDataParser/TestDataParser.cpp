@@ -14,6 +14,12 @@ class TestDataParser : public QObject
     private slots:
         void testParse_data();
         void testParse();
+
+        void testParseRH_data();
+        void testParseRH();
+
+        void testNegativeData_data();
+        void testNegativeData();
 };
 
 void TestDataParser::testParse_data()
@@ -33,15 +39,15 @@ void TestDataParser::testParse_data()
     QTest::newRow("normal data 04") << "temperature=-5.5"  << (int)DATAPOINT_SENSOR << false << "-5.5" << "" << "" << "";
     QTest::newRow("normal data 05") << "temperature=-15.4" << (int)DATAPOINT_SENSOR << false << "-15.4" << "" << "" << "";
 
-    QTest::newRow("Alarm 01") 
-        << "Alarm: High temperature=26.9 level=25.0" 
-        << (int)DATAPOINT_SENSOR 
-        << true 
-        << "High temperature=26.9 level=25.0" << "" << "" << "";
-    QTest::newRow("Alarm 02") 
-        << "Alarm: Low temperature=21.9 level=22.0" 
+    QTest::newRow("Alarm 01")
+        << "Alarm: High temperature=26.9 level=25.0"
         << (int)DATAPOINT_SENSOR
-        << true 
+        << true
+        << "High temperature=26.9 level=25.0" << "" << "" << "";
+    QTest::newRow("Alarm 02")
+        << "Alarm: Low temperature=21.9 level=22.0"
+        << (int)DATAPOINT_SENSOR
+        << true
         << "Low temperature=21.9 level=22.0" << "" << "" << "";
 
 
@@ -54,44 +60,44 @@ void TestDataParser::testParse_data()
     QTest::newRow("meter 05") << "energy=5671606.353 kWh" << (int)DATAPOINT_METER << false << "5671606.353" << "" << "" << "";
 
 
-    QTest::newRow("regul 01") << "value=55.69 ; setpoint=60.00 ; output=000%" 
-        << (int)DATAPOINT_REGULATOR << false 
+    QTest::newRow("regul 01") << "value=55.69 ; setpoint=60.00 ; output=000%"
+        << (int)DATAPOINT_REGULATOR << false
         << "55.69" << "60.00" << "000" << "";
 
-    QTest::newRow("regul 02") << "value=54.97 ; setpoint=60.00 ; output=033%" 
-        << (int)DATAPOINT_REGULATOR << false 
+    QTest::newRow("regul 02") << "value=54.97 ; setpoint=60.00 ; output=033%"
+        << (int)DATAPOINT_REGULATOR << false
         << "54.97" << "60.00" << "033" << "";
 
-    QTest::newRow("regul 03") << "value=-10.21 ; setpoint=-35.00 ; output=070%" 
-        << (int)DATAPOINT_REGULATOR << false 
+    QTest::newRow("regul 03") << "value=-10.21 ; setpoint=-35.00 ; output=070%"
+        << (int)DATAPOINT_REGULATOR << false
         << "-10.21" << "-35.00" << "070" << "";
 
-    QTest::newRow("regul 04") << "value=102.30 ; setpoint=25.56 ; output=100%" 
-        << (int)DATAPOINT_REGULATOR << false 
+    QTest::newRow("regul 04") << "value=102.30 ; setpoint=25.56 ; output=100%"
+        << (int)DATAPOINT_REGULATOR << false
         << "102.30" << "25.56" << "100" << "";
 
-    QTest::newRow("regul 05") << "value=102.30 ; setpoint=25.56 ; output=100% ; active=60%" 
-        << (int)DATAPOINT_REGULATOR << false 
+    QTest::newRow("regul 05") << "value=102.30 ; setpoint=25.56 ; output=100% ; active=60%"
+        << (int)DATAPOINT_REGULATOR << false
         << "102.30" << "25.56" << "100" << "60";
 
-    QTest::newRow("regul 06") << "value=102.30 ; setpoint=25.56 ; output=100% ; active=000%" 
-        << (int)DATAPOINT_REGULATOR << false 
+    QTest::newRow("regul 06") << "value=102.30 ; setpoint=25.56 ; output=100% ; active=000%"
+        << (int)DATAPOINT_REGULATOR << false
         << "102.30" << "25.56" << "100" << "000";
 
-    QTest::newRow("regul 07") << "value=102.30 ; setpoint=25.56 ; output=100% ; active=100%" 
-        << (int)DATAPOINT_REGULATOR << false 
+    QTest::newRow("regul 07") << "value=102.30 ; setpoint=25.56 ; output=100% ; active=100%"
+        << (int)DATAPOINT_REGULATOR << false
         << "102.30" << "25.56" << "100" << "100";
 
-    QTest::newRow("Regul Alarm 01") 
+    QTest::newRow("Regul Alarm 01")
         << "Alarm: Low ; value=13.56 ; alarm=45.67 ; setpoint=50 ; output=100%"
-        << (int)DATAPOINT_REGULATOR 
-        << true 
+        << (int)DATAPOINT_REGULATOR
+        << true
         << "Low ; value=13.56 ; alarm=45.67 ; setpoint=50 ; output=100%" << "" << "" << "";
 
-    QTest::newRow("Regul Alarm 02") 
+    QTest::newRow("Regul Alarm 02")
         << "Alarm: High ; value=40.00 ; alarm=20.00 ; setpoint=50.00 ; output=000%"
-        << (int)DATAPOINT_REGULATOR 
-        << true 
+        << (int)DATAPOINT_REGULATOR
+        << true
         << "High ; value=40.00 ; alarm=20.00 ; setpoint=50.00 ; output=000%" << "" << "" << "";
 
 }
@@ -140,6 +146,105 @@ void TestDataParser::testParse()
     }
 
 }
+
+void TestDataParser::testParseRH_data()
+{
+    QTest::addColumn<QString>("data");
+    QTest::addColumn<int>("type");
+    QTest::addColumn<QString>("temperature");
+    QTest::addColumn<QString>("rh");
+
+    QTest::newRow("normal data 01") << "rh=30\% ; temperature=54.34" << (int)DATAPOINT_RH << "54.34" << "30";
+    QTest::newRow("normal data 02") << "rh=22.22\% ; temperature=11" << (int)DATAPOINT_RH << "11" << "22.22";
+
+    QTest::newRow("normal data 03") << "temperature=55.44 ; rh=33.66\%" << (int)DATAPOINT_RH << "55.44" << "33.66";
+}
+
+void TestDataParser::testParseRH()
+{
+    QFETCH(QString,data);
+    QFETCH(int, type);
+    DataPointType dataType = (DataPointType)type;
+    QFETCH(QString,temperature);
+    QFETCH(QString,rh);
+
+    //qDebug() << __FILE__ << __LINE__ << data << temperature << rh;
+
+    MessageParser parser(data, dataType);
+    QCOMPARE(parser.parse(), true);
+
+    QCOMPARE(parser.isAlarm(), false);
+
+    QCOMPARE(parser.getValue(),  temperature);
+    QCOMPARE(parser.getValue2(), rh);
+}
+
+
+void TestDataParser::testNegativeData_data()
+{
+    QTest::addColumn<QString>("data");
+    QTest::addColumn<int>("type");
+
+    //No Alarm: or spelling
+    QTest::newRow("Alarm bad 01") << "High temperature=26.9 level=25.0"       << (int)DATAPOINT_SENSOR;
+    QTest::newRow("Alarm bad 02") << "Alrm: High temperature=26.9 level=25.0" << (int)DATAPOINT_SENSOR;
+    QTest::newRow("Alarm bad 03") << "High temperature=26.9 level=25.0"       << (int)DATAPOINT_RH;
+    QTest::newRow("Alarm bad 04") << "Alrm: High temperature=26.9 level=25.0" << (int)DATAPOINT_RH;
+
+    //Spelling and missing data
+    QTest::newRow("normal bad 01") << "tempeature=54.34" << (int)DATAPOINT_SENSOR;
+    QTest::newRow("normal bad 02") << "temperature=" << (int)DATAPOINT_SENSOR;
+    QTest::newRow("normal bad 03") << "temperature= " << (int)DATAPOINT_SENSOR;
+
+    //Only Alarm:
+    QTest::newRow("Alarm bad 05") << "Alarm:" << (int)DATAPOINT_SENSOR;
+    QTest::newRow("Alarm bad 06") << "Alarm: " << (int)DATAPOINT_SENSOR;
+
+    //Not both
+    QTest::newRow("RH bad 01") << "rh=30\%" << (int)DATAPOINT_RH;
+    QTest::newRow("RH bad 02") << "temperature=11" << (int)DATAPOINT_RH;
+    //Missing %
+    QTest::newRow("RH bad 03") << "temperature=55.44 ; rh=33.66" << (int)DATAPOINT_RH;
+    //No data
+    QTest::newRow("RH bad 03") << "temperature= ; rh=33.66" << (int)DATAPOINT_RH;
+
+    //Spell error
+    QTest::newRow("Temp bad 01") << "temperture=54.34" << (int)DATAPOINT_SENSOR;
+
+    //No kWh
+    QTest::newRow("meter bad 01") << "energy=1606.353" << (int)DATAPOINT_METER;
+    //Spelling
+    QTest::newRow("meter bad 02") << "eergy=1606.353 kWh" << (int)DATAPOINT_METER;
+    //Whitespace
+    QTest::newRow("meter bad 02") << "energy=1606.353kWh" << (int)DATAPOINT_METER;
+
+
+    //No ;
+    QTest::newRow("regul bad 01") << "value=102.30 setpoint=25.56 output=100%" << (int)DATAPOINT_REGULATOR;
+    //No data
+    QTest::newRow("regul bad 02") << "value= ; setpoint=25.56 ; output=100%" << (int)DATAPOINT_REGULATOR;
+    QTest::newRow("regul bad 03") << "value=102.30 ; setpoint= ; output=100%" << (int)DATAPOINT_REGULATOR;
+    QTest::newRow("regul bad 04") << "value=102.30 ; setpoint=25.56 ; output=" << (int)DATAPOINT_REGULATOR;
+
+    //Spelling
+    QTest::newRow("regul bad 05") << "vaue=22.44 ; setpoint=25.56 ; output=100%" << (int)DATAPOINT_REGULATOR;
+    QTest::newRow("regul bad 06") << "value=22.44 ; setoint=25.56 ; output=100%" << (int)DATAPOINT_REGULATOR;
+    QTest::newRow("regul bad 07") << "value=22.44 ; setpoint=25.56 ; outut=100%" << (int)DATAPOINT_REGULATOR;
+}
+
+void TestDataParser::testNegativeData()
+{
+    QFETCH(QString,data);
+    QFETCH(int, type);
+    DataPointType dataType = (DataPointType)type;
+
+    //qDebug() << __FILE__ << __LINE__ << data << temperature << rh;
+
+    MessageParser parser(data, dataType);
+    QCOMPARE(parser.parse(), false);
+}
+
+
 
 QTEST_MAIN(TestDataParser)
 #include "TestDataParser.moc"

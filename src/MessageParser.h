@@ -35,6 +35,7 @@ class MessageParser
 
         bool alarm;
         QString value;
+        QString value2;
         QString setpoint;
         QString output;
         QString active;
@@ -49,6 +50,7 @@ class MessageParser
         DataPointType getType();
 
         QString getValue();
+        QString getValue2();
         QString getSetpoint();
         QString getOutput();
         QString getActive();

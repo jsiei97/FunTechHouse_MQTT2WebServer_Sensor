@@ -44,67 +44,107 @@ bool MessageParser::parse()
         return false;
     }
 
-    bool hit = false;
+    {
+        QRegExp rxAlarm("Alarm: (.*)");
+        if (rxAlarm.indexIn(data) != -1)
+        {
+            alarm = true;
+            //qDebug() << "Got a alarm: " << rxAlarm.cap(1);
+            value = rxAlarm.cap(1);
+            if(!value.isEmpty())
+            {
+                return true;
+            }
+        }
+    }
+    alarm = false;
 
 
     QRegExp rxData;
     switch ( this->type )
     {
         case DATAPOINT_SENSOR:
-            rxData.setPattern("temperature=([-0-9.]+)");
+            {
+                rxData.setPattern("^temperature=([-0-9.]+)");
+                if (rxData.indexIn(data) != -1)
+                {
+                    value =  rxData.cap(1);
+                    return true;
+                }
+            }
+            break;
+        case DATAPOINT_RH:
+            {
+                rxData.setPattern("temperature=([-0-9.]+)");
+                QRegExp rxRH("rh=([0-9.]+)\%");
+
+                QStringList list = data.split(";", QString::SkipEmptyParts);
+                for (int i = 0; i < list.size(); ++i)
+                {
+                    QString part = list.at(i).trimmed();
+                    //qDebug() << part;
+
+                    if (rxData.indexIn(part) != -1)
+                    {
+                        value =  rxData.cap(1);
+                    }
+                    if (rxRH.indexIn(part) != -1)
+                    {
+                        value2 =  rxRH.cap(1);
+                    }
+                }
+
+                if( ! (value.isEmpty() || value2.isEmpty()) )
+                {
+                    return true;
+                }
+            }
             break;
         case DATAPOINT_REGULATOR:
-            rxData.setPattern("value=([-0-9.]+).*");
+            {
+                QRegExp rxValue("value=([-0-9.]+)");
+                QRegExp rxSetpoint("setpoint=([-0-9.]+)");
+                QRegExp rxOutput("output=([-0-9.]+)%");
+                QRegExp rxActive("active=([-0-9.]+)%");
+                QStringList list = data.split(";", QString::SkipEmptyParts);
+                for (int i = 0; i < list.size(); ++i)
+                {
+                    QString part = list.at(i).trimmed();
+                    //qDebug() << part;
+
+                    if (rxValue.indexIn(part) != -1)
+                        value =  rxValue.cap(1);
+                    else if (rxSetpoint.indexIn(part) != -1)
+                        setpoint = rxSetpoint.cap(1);
+                    else if (rxOutput.indexIn(part) != -1)
+                        output = rxOutput.cap(1);
+                    else if (rxActive.indexIn(part) != -1)
+                        active = rxActive.cap(1);
+                }
+
+                //Manadatory data must be there!
+                if( ! (value.isEmpty() || setpoint.isEmpty() || output.isEmpty()) )
+                {
+                    return true;
+                }
+            }
             break;
         case DATAPOINT_METER:
-            rxData.setPattern("energy=([-0-9.]+) kWh");
+            {
+                rxData.setPattern("energy=([-0-9.]+) kWh");
+                if (rxData.indexIn(data) != -1)
+                {
+                    value =  rxData.cap(1);
+                    return true;
+                }
+            }
             break;
         default :
             return false;
             break;
     }
 
-    QRegExp rxAlarm("Alarm: (.*)");
-
-    if (rxAlarm.indexIn(data) != -1)
-    {
-        alarm = true;
-        //qDebug() << "Got a alarm: " << rxAlarm.cap(1);
-        value = rxAlarm.cap(1);
-        hit = true;
-    }
-    else
-    {
-        if (rxData.indexIn(data) != -1)
-        {
-            hit = true;
-            alarm = false;
-            //qDebug() << "Data=" << rxData.cap(1);
-            value =  rxData.cap(1);
-
-            QRegExp rxValue("value=([-0-9.]+)");
-            QRegExp rxSetpoint("setpoint=([-0-9.]+)");
-            QRegExp rxOutput("output=([-0-9.]+)%");
-            QRegExp rxActive("active=([-0-9.]+)%");
-            QStringList list = data.split(";", QString::SkipEmptyParts);
-            for (int i = 0; i < list.size(); ++i)
-            {
-                QString part = list.at(i).trimmed();
-                //qDebug() << part;
-
-                if (rxValue.indexIn(part) != -1)
-                    value =  rxValue.cap(1);
-                else if (rxSetpoint.indexIn(part) != -1)
-                    setpoint = rxSetpoint.cap(1);
-                else if (rxOutput.indexIn(part) != -1)
-                    output = rxOutput.cap(1);
-                else if (rxActive.indexIn(part) != -1)
-                    active = rxActive.cap(1);
-            }
-        }
-    }
-
-    return hit;
+    return false;
 }
 
 bool MessageParser::isAlarm()
@@ -116,9 +156,15 @@ DataPointType MessageParser::getType()
 {
     return this->type;
 }
+
 QString MessageParser::getValue()
 {
     return value;
+}
+
+QString MessageParser::getValue2()
+{
+    return value2;
 }
 
 QString MessageParser::getSetpoint()
