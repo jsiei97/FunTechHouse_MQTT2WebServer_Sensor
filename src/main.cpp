@@ -227,7 +227,7 @@ int main(int argc, char *argv[])
                 mqtt->reconnect();
             }
 
-            sleep(1);
+            //sleep(1);
             union sigval value;
             value.sival_int = 30;
             sigqueue(pidMain, SIGUSR2, value);
@@ -309,7 +309,7 @@ void sigusr2(int signo, siginfo_t *info, void *extra)
 
     if(pid == pidMosq)
     {
-        printf("%s:%d : pidMosq is alive\n", __func__, __LINE__);
+        //printf("%s:%d : pidMosq is alive (%d)\n", __func__, __LINE__, val);
         mosqUptime = get_uptime();
     }
 }
