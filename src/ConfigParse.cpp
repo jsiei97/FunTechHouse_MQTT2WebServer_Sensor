@@ -69,13 +69,18 @@ bool ConfigParse::parse(QList<DataPoint> *list)
     QFile file(configfile);
     if (!file.open(QIODevice::ReadOnly))
     {
-        qDebug() << "Error can't open file";
+        qDebug() << "Error can't open file" << configfile;
         return false;
     }
-    if (!doc.setContent(&file))
+
+    QString domErr;
+    int domErrLine;
+    int domErrCol;
+    if (!doc.setContent(&file, false, &domErr, &domErrLine, &domErrCol))
     {
         file.close();
-        qDebug() << "Error can't parse file";
+        qDebug() << "Error can't parse file" << configfile;
+        qDebug() << " " << domErr << domErrLine << domErrCol;
         return false;
     }
     file.close();
@@ -100,7 +105,7 @@ bool ConfigParse::parse(QList<DataPoint> *list)
                 //qDebug() << qPrintable(e.tagName()); // the node really is an element.
                 if(e.hasAttribute("name"))
                 {
-                    //qDebug() << qPrintable(e.tagName()) << qPrintable(e.attribute("name"));
+                    qDebug() << qPrintable(e.tagName()) << qPrintable(e.attribute("name"));
                     dp.setName( e.attribute("name") );
                 }
 
@@ -110,7 +115,7 @@ bool ConfigParse::parse(QList<DataPoint> *list)
                     {
                         QDomNode tag = tagId.at(i);
                         QDomElement tagE = tag.toElement();
-                        //qDebug() << qPrintable(tagE.tagName()) << tagE.text();
+                        qDebug() << qPrintable(tagE.tagName()) << tagE.text();
                         dp.setBaseURL( tagE.text() );
                     }
                 }
@@ -121,7 +126,7 @@ bool ConfigParse::parse(QList<DataPoint> *list)
                     {
                         QDomNode tag = tagId.at(i);
                         QDomElement tagE = tag.toElement();
-                        //qDebug() << qPrintable(tagE.tagName()) << tagE.text();
+                        qDebug() << qPrintable(tagE.tagName()) << tagE.text();
                         dp.setDeviceId( tagE.text() );
                     }
                 }
@@ -132,7 +137,7 @@ bool ConfigParse::parse(QList<DataPoint> *list)
                     {
                         QDomNode tag = tagId.at(i);
                         QDomElement tagE = tag.toElement();
-                        //qDebug() << qPrintable(tagE.tagName()) << tagE.text();
+                        qDebug() << qPrintable(tagE.tagName()) << tagE.text();
                         if(!dp.setType( tagE.text() ))
                         {
                             qDebug() << "Error: not a valid type:" << tagE.text();
@@ -147,7 +152,7 @@ bool ConfigParse::parse(QList<DataPoint> *list)
                     {
                         QDomNode tag = tagId.at(i);
                         QDomElement tagE = tag.toElement();
-                        //qDebug() << qPrintable(tagE.tagName()) << tagE.text();
+                        qDebug() << qPrintable(tagE.tagName()) << tagE.text();
                         dp.setMosqTopic( tagE.text() );
                     }
                 }
@@ -159,7 +164,7 @@ bool ConfigParse::parse(QList<DataPoint> *list)
                 }
             }
         }
-        //qDebug() << "";
+        qDebug() << "";
     }
 
 
