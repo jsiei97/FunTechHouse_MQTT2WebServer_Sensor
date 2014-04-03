@@ -40,9 +40,13 @@ void TestMosq2QuickSurf::testParse_data()
         << "http://x/y.php?1=2&ref_Supply=102.30&ref_SetPoint=25.56&ref_Actuator=100&ref_Activator=60";
 
     QTest::newRow("test 04") << "temperature=55.44 ; rh=33.66\%" 
-        << (int)DATAPOINT_RH << "ref"
-        << "http://x/y.php?1=2&ref=55.44";
-    /// @todo Add the rh data to the url. maybe like  &ref_rh=33.66;
+        << (int)DATAPOINT_RH << "ref03"
+        << "http://x/y.php?1=2&ref03=55.44&ref04=33.66"; 
+
+    QTest::newRow("test 05") << "temperature=55.44 ; rh=33.66\%" 
+        << (int)DATAPOINT_RH << "ref13"
+        << "http://x/y.php?1=2&ref13=55.44&ref14=33.66"; 
+    //For now rh becomes the next number if name ends with 2 digits
 }
 
 
