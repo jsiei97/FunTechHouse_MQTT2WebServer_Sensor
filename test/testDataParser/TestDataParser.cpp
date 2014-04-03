@@ -230,6 +230,9 @@ void TestDataParser::testNegativeData_data()
     QTest::newRow("regul bad 05") << "vaue=22.44 ; setpoint=25.56 ; output=100%" << (int)DATAPOINT_REGULATOR;
     QTest::newRow("regul bad 06") << "value=22.44 ; setoint=25.56 ; output=100%" << (int)DATAPOINT_REGULATOR;
     QTest::newRow("regul bad 07") << "value=22.44 ; setpoint=25.56 ; outut=100%" << (int)DATAPOINT_REGULATOR;
+
+    #Fail on data with a #
+    QTest::newRow("Hello 1") << "#Hello world" << (int)DATAPOINT_RH;
 }
 
 void TestDataParser::testNegativeData()
