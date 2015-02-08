@@ -47,6 +47,10 @@ MosqConnect::MosqConnect(const char *id, const char *host, int port, QList<DataP
     connect(host, port, keepalive);
 };
 
+MosqConnect::~MosqConnect()
+{
+}
+
 void MosqConnect::on_connect(int rc)
 {
     printf("Connected with code %d.\n", rc);
