@@ -1,4 +1,4 @@
 check process M2W_Sensor with pidfile /var/run/M2W_Sensor.pid
-	start = "/etc/init.d/M2W_Sensor start"
-	stop = "/etc/init.d/M2W_Sensor stop"
+	start = "/etc/init.d/M2W_Sensor.sh start"
+	stop = "/etc/init.d/M2W_Sensor.sh stop"
 
