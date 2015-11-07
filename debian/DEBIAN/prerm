@@ -1,0 +1,4 @@
+#!/bin/bash
+echo Stoping demon
+/etc/init.d/M2W_Sensor.sh stop
+

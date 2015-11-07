@@ -1,0 +1,4 @@
+#!/bin/bash
+echo Starting deamon
+/etc/init.d/M2W_Sensor.sh start &
+

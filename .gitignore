@@ -2,8 +2,12 @@
 *.o
 *.moc
 
+# exec
+M2W_Sensor
+
 # Autogen
 Makefile
+*.deb
 
 # Misc
 tags
