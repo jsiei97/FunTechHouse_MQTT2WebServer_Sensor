@@ -11,7 +11,7 @@
 
 M2W=/usr/sbin/M2W_Sensor
 M2W_PID=/var/run/M2W_Sensor.pid
-M2W_CFG=/etc/M2W_configGranevFunTech.xml
+M2W_CFG=/etc/FunTech_M2W_config.xml
 
 M2W_DESC="FunTechHouse_MQTT2WebServer_Sensor"
 M2W_NAME=M2W_Sensor
