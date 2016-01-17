@@ -13,3 +13,13 @@ Depends on
 1. Mosquitto c++ lib 1.0.2 and newer
 2. libcurl (apt-get install libcurl4-openssl-dev)
 
+
+Build and install
+=================
+
+1. Create "/etc/FunTech_M2W_config.xml"
+2. Run ./createdeb.sh 
+3. sudo dpkg -i m2wsensor_*.deb 
+
+
+
