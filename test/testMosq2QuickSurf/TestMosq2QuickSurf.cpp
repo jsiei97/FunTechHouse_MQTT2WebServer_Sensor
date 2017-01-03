@@ -35,6 +35,10 @@ void TestMosq2QuickSurf::testParse_data()
         << (int)DATAPOINT_METER << "ref"
         << "http://x/y.php?1=2&ref=10.353";
 
+    QTest::newRow("test 02") << "energy=29.072kWh time=2016-12-31T07:23:19Z" 
+        << (int)DATAPOINT_METER_KWH << "ref"
+        << "http://x/y.php?1=2&ref=29.072&date=2016-12-31T07:23:19Z";
+
     QTest::newRow("test 03") << "value=102.30 ; setpoint=25.56 ; output=100% ; active=60%"
         << (int)DATAPOINT_REGULATOR << "ref"
         << "http://x/y.php?1=2&ref_Supply=102.30&ref_SetPoint=25.56&ref_Actuator=100&ref_Activator=60";

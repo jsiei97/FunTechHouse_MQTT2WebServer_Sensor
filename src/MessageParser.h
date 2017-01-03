@@ -34,6 +34,7 @@ class MessageParser
         DataPointType type;
 
         bool alarm;
+        QString date;
         QString value;
         QString value2;
         QString setpoint;
@@ -49,6 +50,7 @@ class MessageParser
 
         DataPointType getType();
 
+        QString getDate();
         QString getValue();
         QString getValue2();
         QString getSetpoint();

@@ -37,6 +37,13 @@
         <topic> FunTechHouse/el </topic>
     </datapoint>
 
+    <datapoint name="ElMeter">
+        <baseurl>http://localhost/test/index.php</baseurl>
+        <id> id=61 </id>
+        <type> meter_kWh </type>
+        <topic> FunTechHouse/el2 </topic>
+    </datapoint>
+
     <datapoint name="Ref20">
         <baseurl>http://localhost/test/index.php</baseurl>
         <id> id=7 </id>

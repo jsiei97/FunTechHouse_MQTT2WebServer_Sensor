@@ -70,7 +70,7 @@ void TestConfig::testParseFile()
     QCOMPARE(config.getMqttServer(), QString("localhost"));
     QCOMPARE(config.getMqttAppName(),QString("FunTechHouse_MQTT2WebServer"));
 
-    QCOMPARE(list->size(), 6);
+    QCOMPARE(list->size(), 7);
 
     {
         DataPoint dp = list->at(0);
@@ -119,6 +119,15 @@ void TestConfig::testParseFile()
 
     {
         DataPoint dp = list->at(5);
+        QCOMPARE(dp.getName(),    QString("ElMeter"));
+        QCOMPARE(dp.getBaseURL(), QString("http://localhost/test/index.php"));
+        QCOMPARE(dp.getDeviceId(), QString("id=61"));
+        QCOMPARE((int)dp.getType(), (int)DATAPOINT_METER_KWH);
+        QCOMPARE(dp.getMosqTopic(), QString("FunTechHouse/el2"));
+    }
+
+    {
+        DataPoint dp = list->at(6);
         QCOMPARE(dp.getName(),    QString("Ref20"));
         QCOMPARE(dp.getBaseURL(), QString("http://localhost/test/index.php"));
         QCOMPARE(dp.getDeviceId(), QString("id=7"));

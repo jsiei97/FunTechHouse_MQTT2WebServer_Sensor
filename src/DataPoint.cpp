@@ -79,6 +79,9 @@ void DataPoint::print()
         case DATAPOINT_METER:
             typeName.append("meter");
             break;
+        case DATAPOINT_METER_KWH:
+            typeName.append("meter_kWh");
+            break;
         default :
             typeName.append("NOT VALID TYPE");
             break;
@@ -118,6 +121,11 @@ bool DataPoint::setType( QString type ){
     else if(0==type.compare("meter"))
     {
             this->type = DATAPOINT_METER;
+            ret = true;
+    }
+    else if(0==type.compare("meter_kWh"))
+    {
+            this->type = DATAPOINT_METER_KWH;
             ret = true;
     }
     else if(0==type.compare("rh"))

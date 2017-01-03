@@ -18,6 +18,9 @@ class TestDataParser : public QObject
         void testParseRH_data();
         void testParseRH();
 
+        void testParseMeter_kWh_data();
+        void testParseMeter_kWh();
+
         void testNegativeData_data();
         void testNegativeData();
 };
@@ -180,6 +183,48 @@ void TestDataParser::testParseRH()
 }
 
 
+void TestDataParser::testParseMeter_kWh_data()
+{
+    QTest::addColumn<QString>("data");
+    QTest::addColumn<int>("type");
+    QTest::addColumn<QString>("kWh");
+    QTest::addColumn<QString>("date");
+
+    QTest::newRow("meter 01") 
+        << "energy=0.000kWh time=2017-01-03T06:46:07Z" << (int)DATAPOINT_METER_KWH 
+        <<        "0.000"    << "2017-01-03T06:46:07Z";
+
+    QTest::newRow("meter 02") 
+        << "energy=2.776kWh time=2017-01-03T08:49:07Z" << (int)DATAPOINT_METER_KWH 
+        <<        "2.776"    << "2017-01-03T08:49:07Z";
+
+    QTest::newRow("meter 03") 
+        << "energy=12342.778kWh time=2017-01-03T06:46:07Z" << (int)DATAPOINT_METER_KWH 
+        <<        "12342.778"    << "2017-01-03T06:46:07Z";
+
+    //energy=29.072kWh time=2016-12-31T07:23:19Z
+}
+
+void TestDataParser::testParseMeter_kWh()
+{
+    QFETCH(QString,data);
+    QFETCH(int, type);
+    DataPointType dataType = (DataPointType)type;
+    QFETCH(QString,kWh);
+    QFETCH(QString,date);
+
+    //qDebug() << __FILE__ << __LINE__ << data << kWh << date;
+
+    MessageParser parser(data, dataType);
+    QCOMPARE(parser.parse(), true);
+
+    QCOMPARE(parser.isAlarm(), false);
+
+    QCOMPARE(parser.getValue(), kWh);
+    QCOMPARE(parser.getDate(),  date);
+}
+
+
 void TestDataParser::testNegativeData_data()
 {
     QTest::addColumn<QString>("data");
@@ -231,7 +276,7 @@ void TestDataParser::testNegativeData_data()
     QTest::newRow("regul bad 06") << "value=22.44 ; setoint=25.56 ; output=100%" << (int)DATAPOINT_REGULATOR;
     QTest::newRow("regul bad 07") << "value=22.44 ; setpoint=25.56 ; outut=100%" << (int)DATAPOINT_REGULATOR;
 
-    #Fail on data with a #
+    //Fail on data with a #
     QTest::newRow("Hello 1") << "#Hello world" << (int)DATAPOINT_RH;
 }
 

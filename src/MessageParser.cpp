@@ -139,6 +139,18 @@ bool MessageParser::parse()
                 }
             }
             break;
+        case DATAPOINT_METER_KWH:
+            {
+                //energy=29.072kWh time=2016-12-31T06:52:19Z
+                rxData.setPattern("energy=([-0-9.]+)kWh time=([0-9]{4,4}-[0-9]{2,2}-[0-9]{2,2}T[0-9]{2,2}:[0-9]{2,2}:[0-9]{2,2}Z)");
+                if (rxData.indexIn(data) != -1)
+                {
+                    value =  rxData.cap(1);
+                    date  =  rxData.cap(2);
+                    return true;
+                }
+            }
+            break;
         default :
             return false;
             break;
@@ -155,6 +167,11 @@ bool MessageParser::isAlarm()
 DataPointType MessageParser::getType()
 {
     return this->type;
+}
+
+QString MessageParser::getDate()
+{
+    return date;
 }
 
 QString MessageParser::getValue()

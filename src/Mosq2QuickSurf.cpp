@@ -128,6 +128,13 @@ bool Mosq2QuickSurf::send(DataPoint* dp, QString data)
             }
         }
 
+        QString date = parser.getDate();
+        if(!date.isEmpty())
+        {
+            url.append("&date=");
+            url.append(date);
+        }
+
         dataOK = true;
     }
 

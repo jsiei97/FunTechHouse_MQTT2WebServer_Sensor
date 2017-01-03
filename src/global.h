@@ -36,7 +36,8 @@ typedef enum
     DATAPOINT_SENSOR,        ///< A value, and alarm
     DATAPOINT_RH,            ///< RH (Relative Humidity), and temperature with alarm.
     DATAPOINT_REGULATOR,     ///< value, setpoint and output. And alarm
-    DATAPOINT_METER          ///< A meter i.e. a electric meter with a incemental reading.
+    DATAPOINT_METER,         ///< A meter i.e. a electric meter with a incemental reading.
+    DATAPOINT_METER_KWH      ///< A electric meter with timestamp
 } DataPointType;
 
 
